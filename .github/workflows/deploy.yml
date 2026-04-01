@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -21,18 +23,30 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: npm run test -- --coverage
+        run: npm run test -- --coverage --watchAll=false
+
+      - name: Debug - Verify token exists
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "ERROR: SONAR_TOKEN is empty!"
+            exit 1
+          else
+            echo "✓ SONAR_TOKEN is set (value redacted for security)"
+          fi
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2.1.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: --openssl-legacy-provider
         with:
           args: >
             -Dsonar.projectKey=raviteja081295_TinderApp
             -Dsonar.organization=raviteja081295
             -Dsonar.sources=src
+            -Dsonar.exclusions=node_modules/**
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
       - name: Build app
         run: npm run build
