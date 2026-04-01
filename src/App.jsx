@@ -9,6 +9,7 @@ function App() {
       <button onClick={() => setText("Hello MERN 🚀")}>
         Click Me
       </button>
+      
     </div>
   )
 }
