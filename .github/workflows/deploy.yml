@@ -23,5 +23,14 @@ jobs:
       - name: Run tests
         run: npm run test -- --coverage
 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=raviteja081295_ReactApp
+            -Dsonar.organization=raviteja081295
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Build app
         run: npm run build
