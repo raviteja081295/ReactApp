@@ -25,7 +25,9 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci 
-
+      - name: Fix coverage paths
+        run: |
+          sed -i 's|\\|/|g' coverage/lcov.info
       # ✅ Optional but useful (keep for now)
       - name: Debug - Verify coverage
         run: |
