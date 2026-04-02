@@ -26,41 +26,24 @@ jobs:
       - name: Run tests
         run: npm run test:ci 
 
-      # Fix Windows → Linux path issue in coverage
       - name: Fix coverage paths
         run: |
           sed -i 's|\\|/|g' coverage/lcov.info
 
-      # Debug (keep until confirmed working)
-      - name: Debug coverage
+      - name: Verify coverage file
         run: |
-          ls -la coverage || echo "No coverage folder"
-          cat coverage/lcov.info | head -n 20 || echo "No lcov file"
+          cat coverage/lcov.info
 
-      - name: Debug token
-        run: |
-          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
-            echo "ERROR: SONAR_TOKEN is empty!"
-            exit 1
-          else
-            echo "✓ SONAR_TOKEN is set"
-          fi
-
-      # Install scanner
       - name: Install Sonar Scanner
         run: npm install -g sonar-scanner
 
-      # FINAL Sonar step
       - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=raviteja081295_TinderApp \
-            -Dsonar.organization=raviteja081295 \
-            -Dsonar.sources=src \
-            -Dsonar.exclusions=node_modules/** \
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=$SONAR_TOKEN
 
       - name: Build app
         run: npm run build
