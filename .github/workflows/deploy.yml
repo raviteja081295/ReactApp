@@ -30,27 +30,22 @@ jobs:
       - name: Run tests
         run: npm run test:ci 
 
-      # Fix Windows backslash issue
+      # ✅ Fix ONLY slashes (Windows → Linux)
       - name: Fix coverage slashes
         run: |
           sed -i 's|\\|/|g' coverage/lcov.info
 
-      # 🔥 CRITICAL FIX (absolute path mapping)
-      - name: Fix coverage absolute paths
+      # ✅ Debug: verify paths (IMPORTANT)
+      - name: Verify lcov paths
         run: |
-          sed -i "s|SF:src/|SF:/home/runner/work/${{ github.repository }}/src/|g" coverage/lcov.info
-
-      # Debug (keep for verification)
-      - name: Debug coverage
-        run: |
-          echo "---- LCOV CONTENT ----"
-          cat coverage/lcov.info | head -n 20
+          echo "---- LCOV PATHS ----"
+          grep SF coverage/lcov.info || true
 
       # Install Sonar Scanner
       - name: Install Sonar Scanner
         run: npm install -g sonar-scanner
 
-      # SonarCloud scan
+      # SonarCloud Scan
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -62,10 +57,3 @@ jobs:
       # Build
       - name: Build app
         run: npm run build
-
-      # Verify coverage file
-      - name: Verify coverage file
-        run: |
-          ls -l coverage/lcov.info
-          head -n 20 coverage/lcov.info
-          grep -n '^SF:' coverage/lcov.info | head
