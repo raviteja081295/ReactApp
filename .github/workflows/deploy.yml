@@ -9,34 +9,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
+      # Node setup
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
       
+      # Install deps
       - name: Install dependencies
         run: npm ci
 
+      # Run tests (generate coverage)
       - name: Run tests
         run: npm run test:ci 
 
+      # Fix Windows path issue in coverage file
       - name: Fix coverage paths
         run: |
           sed -i 's|\\|/|g' coverage/lcov.info
 
-      - name: Verify coverage file
+      # Debug (keep for now)
+      - name: Debug coverage
         run: |
-          cat coverage/lcov.info
+          ls -la coverage || echo "No coverage folder"
+          cat coverage/lcov.info | head -n 20 || echo "No lcov file"
 
+      # Install Sonar Scanner
       - name: Install Sonar Scanner
         run: npm install -g sonar-scanner
 
+      # SonarCloud Analysis (uses sonar-project.properties)
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -45,5 +54,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN
 
+      # Build app
       - name: Build app
         run: npm run build
