@@ -18,12 +18,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests
         run: npm run test:ci 
+
+      # ✅ Optional but useful (keep for now)
+      - name: Debug - Verify coverage
+        run: |
+          ls -la coverage || echo "No coverage folder"
+          cat coverage/lcov.info | head -n 10 || echo "No lcov file"
 
       - name: Debug - Verify token exists
         run: |
@@ -31,22 +38,24 @@ jobs:
             echo "ERROR: SONAR_TOKEN is empty!"
             exit 1
           else
-            echo "✓ SONAR_TOKEN is set (value redacted for security)"
+            echo "✓ SONAR_TOKEN is set"
           fi
 
+      # ❌ REMOVE Docker Sonar action
+      # ✅ USE CLI INSTEAD (this fixes your error)
+      - name: Install Sonar Scanner
+        run: npm install -g sonar-scanner
+
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2.1.1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: --openssl-legacy-provider
-        with:
-          args: >
-            -Dsonar.projectKey=raviteja081295_TinderApp
-            -Dsonar.organization=raviteja081295
-            -Dsonar.sources=src
-            -Dsonar.exclusions=node_modules/**
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=raviteja081295_TinderApp \
+            -Dsonar.organization=raviteja081295 \
+            -Dsonar.sources=src \
+            -Dsonar.exclusions=node_modules/** \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       - name: Build app
         run: npm run build
