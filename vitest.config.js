@@ -5,20 +5,20 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov'],
-      reportsDirectory: './coverage',
-      
-      // 🔥 CRITICAL FIX
-      all: true,
-      include: ['src/**/*'],
-    }
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+  globals: true,
+  environment: 'jsdom',
+  coverage: {
+    provider: 'v8',
+    reporter: ['text', 'lcov'],
+    reportsDirectory: './coverage',
+    all: true,
+    include: ['src/**/*'],
+    exclude: [
+    'src/assets/**',
+    'src/**/*.css',
+    'src/main.jsx',
+    'src/setupTests.js' 
+  ]
+  }
+}
 })
