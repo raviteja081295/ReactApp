@@ -56,9 +56,7 @@ jobs:
           sonar-scanner \
             -Dsonar.projectKey=raviteja081295_TinderApp \
             -Dsonar.organization=raviteja081295 \
-            -Dsonar.sources=. \
-            -Dsonar.inclusions=src/**/* \
-            -Dsonar.javascript.file.suffixes=.js,.jsx \
+            -Dsonar.sources=src \
             -Dsonar.exclusions=node_modules/** \
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=https://sonarcloud.io \
