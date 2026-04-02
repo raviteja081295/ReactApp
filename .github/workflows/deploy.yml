@@ -38,8 +38,8 @@ jobs:
       # ✅ Debug: verify paths (IMPORTANT)
       - name: Verify lcov paths
         run: |
-          echo "---- LCOV PATHS ----"
-          grep SF coverage/lcov.info || true
+          sed -i 's|\\\\|/|g' coverage/lcov.info
+          cat coverage/lcov.info | head -20
 
       # Install Sonar Scanner
       - name: Install Sonar Scanner
